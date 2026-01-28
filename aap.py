@@ -52,7 +52,9 @@ def create_pdf(selected_staff):
         
         pdf.ln(5)
         
-    return pdf.output(dest='S')
+    pdf_output = pdf.output() 
+    return bytes(pdf_output)
+    
 # --- STREAMLIT UI ---
 st.title("📋 Staff Shift Scheduler")
 
@@ -68,14 +70,14 @@ selected_staff = st.multiselect(
 if len(selected_staff) == num_to_select:
     st.success(f"All {num_to_select} staff selected!")
     
-    if st.button("Generate PDF"):
-        pdf_data = create_pdf(selected_staff)
-        st.download_button(
-            label="Download Shift Rounds PDF",
-            data=pdf_data,
-            file_name="staff_rounds.pdf",
-            mime="application/pdf"
-        )
+  if st.button("Generate PDF"):
+    pdf_bytes = create_pdf(selected_staff)
+    st.download_button(
+        label="Download Shift Rounds PDF",
+        data=pdf_bytes, # Passing the explicit bytes here
+        file_name="staff_rounds.pdf",
+        mime="application/pdf"
+      )
 else:
     st.info(f"Please select exactly {num_to_select} staff members to enable PDF generation.")
 
