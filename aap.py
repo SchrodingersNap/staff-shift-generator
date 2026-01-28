@@ -19,40 +19,40 @@ STAFF_NAMES = [
     "Sudhir .", "Sanjib Kumar Mondal"
 ]
 
+
 def create_pdf(selected_staff):
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
-    pdf.set_font("Arial", size=12)
+    pdf.set_font("Arial", size=11)
 
-    # Pairing logic: creates list of strings "Name1 + Name2 -"
     pairs = []
     for i in range(0, len(selected_staff), 2):
         if i + 1 < len(selected_staff):
             pairs.append(f"{selected_staff[i]} + {selected_staff[i+1]} -")
         else:
-            pairs.append(f"{selected_staff[i]} (No Partner) -")
+            pairs.append(f"{selected_staff[i]} (Solo) -")
 
-    # Generate 7 Rounds
     for round_num in range(1, 8):
-        pdf.set_font("Arial", 'B', 14)
-        pdf.cell(200, 10, txt=f"Round {round_num}", ln=True, align='L')
-        pdf.set_font("Arial", size=11)
+        pdf.set_font("Arial", 'B', 12)
+        pdf.cell(0, 10, f"ROUND {round_num}", ln=True, border='B')
+        pdf.ln(2)
         
+        pdf.set_font("Arial", size=10)
         for idx, pair in enumerate(pairs):
             if round_num == 1:
-                # Round 1: Numbered format
-                text = f"{idx + 1}. {pair}"
+                # Round 1: Numbered
+                pdf.cell(0, 8, f"{idx + 1}. {pair}", ln=True)
             else:
-                # Round 2-7: Box format [ ]
-                text = f"[ ] {pair}"
-            
-            pdf.cell(200, 8, txt=text, ln=True)
+                # Rounds 2-7: Draw a literal square box
+                current_y = pdf.get_y()
+                pdf.rect(10, current_y + 2, 4, 4) # Draw the box (x, y, width, height)
+                pdf.set_x(16) # Move text to the right of the box
+                pdf.cell(0, 8, pair, ln=True)
         
-        pdf.ln(5) # Add small space between rounds
+        pdf.ln(5)
         
     return pdf.output(dest='S')
-
 # --- STREAMLIT UI ---
 st.title("📋 Staff Shift Scheduler")
 
@@ -78,3 +78,4 @@ if len(selected_staff) == num_to_select:
         )
 else:
     st.info(f"Please select exactly {num_to_select} staff members to enable PDF generation.")
+
